@@ -18,6 +18,14 @@ Bounce bounce = Bounce();
 // SET A VARIABLE TO STORE THE LED STATE
 int ledState = LOW;
 
+volatile uint16_t ball_count = 0;
+
+void incrementCount() {
+  nointerrupts();
+  ball_count++;
+  interrupts();
+}
+
 // ███████╗███████╗████████╗██╗   ██╗██████╗
 // ██╔════╝██╔════╝╚══██╔══╝██║   ██║██╔══██╗
 // ███████╗█████╗     ██║   ██║   ██║██████╔╝
@@ -52,6 +60,9 @@ void setup()
   // LED SETUP
   pinMode(LED_PIN, OUTPUT);
   digitalWrite(LED_PIN, ledState);
+  
+  // Interrupt Setup
+  attachInterrupt(0, incrementCount, RISING);
 
   Watchdog.enable(4000);
   Serial.println("Setup Complete");
