@@ -15,15 +15,18 @@
 // INSTANTIATE A Bounce OBJECT
 Bounce bounce = Bounce();
 
-// SET A VARIABLE TO STORE THE LED STATE
-int ledState = LOW;
-
 volatile uint16_t ball_count = 0;
 
 void incrementCount() {
   nointerrupts();
   ball_count++;
   interrupts();
+}
+
+void empty_pig() {
+  digitalWrite(RELAY_PIN, HIGH);
+  delay(500);
+  digitalWrite(RELAY_PIN, LOW);
 }
 
 // ███████╗███████╗████████╗██╗   ██╗██████╗
@@ -59,7 +62,11 @@ void setup()
 
   // LED SETUP
   pinMode(LED_PIN, OUTPUT);
-  digitalWrite(LED_PIN, ledState);
+  digitalWrite(LED_PIN, LOW);
+  
+  // RELAY SETUP
+  pinMode(RELAY_PIN, OUTPUT);
+  digitalWrite(RELAY_PIN, LOW);
   
   // Interrupt Setup
   attachInterrupt(0, incrementCount, RISING);
@@ -77,24 +84,20 @@ void setup()
 
 void loop()
 {
-  // Update the Bounce instance (YOU MUST DO THIS EVERY LOOP)
-  bounce.update();
-
-  // <Bounce>.changed() RETURNS true IF THE STATE CHANGED (FROM HIGH TO LOW OR LOW TO HIGH)
-  if (bounce.changed())
-  {
-    // THE STATE OF THE INPUT CHANGED
-    // GET THE STATE
-    int deboucedInput = bounce.read();
-    // IF THE CHANGED VALUE IS LOW
-    if (deboucedInput == LOW)
-    {
-      ledState = !ledState;            // SET ledState TO THE OPPOSITE OF ledState
-      digitalWrite(LED_PIN, ledState); // WRITE THE NEW ledState
-      startAudio();
+  receiveFromCube();
+  int val = analogRead(BALL_FULL);
+  if (val < 200) {
+    sendGoEvent(9);
+    for (int i=0; i<4; i++) {
+      Watchdog.reset();
       delay(1000);
-      stopAudio();
+    }
+    
+  if (ball_count > BALL_MAX) {
       sendGoEvent(1); // Does not work inside VS1053 audio startPlayingFile!
+      delay(100);
+      startAudio();
+      empty_pig();
     }
   }
 
