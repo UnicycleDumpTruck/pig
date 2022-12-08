@@ -4,9 +4,9 @@
 #include <Arduino.h>
 
 // Radio Pins
-#define RFM69_CS A4
-#define RFM69_INT A3
-#define RFM69_RST 11
+#define RFM69_CS 8
+#define RFM69_INT 3
+#define RFM69_RST 4
 
 // Audio Featherwing Pins
 #define SHIELD_RESET -1 // VS1053 reset pin (unused!)
@@ -18,5 +18,6 @@
 // Button Pins
 #define BOUNCE_PIN A0
 #define LED_PIN 13
+#define RELAY_PIN 12
 
 #endif
