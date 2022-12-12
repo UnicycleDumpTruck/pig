@@ -12,5 +12,6 @@
 
 void radioSetup();
 void sendGoEvent(uint8_t s);
+bool receiveFromCube();
 
 #endif

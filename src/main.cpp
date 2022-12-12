@@ -12,13 +12,15 @@
 // https://github.com/thomasfredericks/Bounce2
 #include <Bounce2.h>
 
+#define BALL_MAX 100
+
 // INSTANTIATE A Bounce OBJECT
 Bounce bounce = Bounce();
 
 volatile uint16_t ball_count = 0;
 
 void incrementCount() {
-  nointerrupts();
+  noInterrupts();
   ball_count++;
   interrupts();
 }

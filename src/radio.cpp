@@ -91,9 +91,9 @@ void radioSetup()
     Serial.println("Radio Setup Complete");
 }
 
-void receiveFromCube()
+bool receiveFromCube()
 {
-	selectRadio();  
+  digitalWrite(RFM69_CS, LOW);
 	if (rf69.recv((uint8_t*)&eventData, &len) && len == sizeof(eventData))
 	{    
 		char buf[16];
@@ -114,12 +114,16 @@ void receiveFromCube()
 		if (eventData.cubeID == 0) // if message was from gateway
 		{
 			if (eventData.side == 61) { // if message is to drop the pig
-				digitalWrite(RELAY,HIGH); // drop the pig
+				digitalWrite(RELAY_PIN, HIGH); // drop the pig
 				delay(500);
-				digitalWrite(RELAY,LOW);
+				digitalWrite(RELAY_PIN,LOW);
+        digitalWrite(RFM69_CS, HIGH);
+        return true;
 			}
 		}
 		Serial.println("");
+    digitalWrite(RFM69_CS, HIGH);
+    return false;
 	}
 }
 

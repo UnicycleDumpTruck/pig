@@ -20,4 +20,6 @@
 #define LED_PIN 13
 #define RELAY_PIN 12
 
+#define BALL_FULL A0    // Switch inside pig body triggered by side pressure
+
 #endif
