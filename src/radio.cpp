@@ -32,7 +32,8 @@ void sendGoEvent(uint8_t s)
     digitalWrite(RFM69_CS, LOW);
     delay(10);
     bool t_result = rf69.send((uint8_t *)&eventData, sizeof(eventData));
-    rf69.waitPacketSent();
+    delay(100);
+    //rf69.waitPacketSent();
     if (t_result)
     {
         Serial.println("Send true");

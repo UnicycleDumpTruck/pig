@@ -18,6 +18,8 @@
 Bounce bounce = Bounce();
 
 volatile uint16_t ball_count = 0;
+uint16_t last_count = 0;
+uint16_t current_count = 0;
 
 void incrementCount() {
   noInterrupts();
@@ -34,16 +36,19 @@ void zeroCount() {
 void empty_pig() {
   sendGoEvent(1); // Does not work inside VS1053 audio startPlayingFile!
   delay(100);
-  zeroCount();
-  startAudio();
+  //startAudio();
   delay(1000);
   digitalWrite(RELAY_PIN, HIGH);
   delay(500);
+  Watchdog.reset();
   digitalWrite(RELAY_PIN, LOW);
   for (int i=0; i<4; i++) {
       Watchdog.reset();
       delay(1000);
   }
+  Serial.print("About to zero count, currently at: ");
+  Serial.print(ball_count);
+  zeroCount();
 }
 
 // ███████╗███████╗████████╗██╗   ██╗██████╗
@@ -56,13 +61,13 @@ void empty_pig() {
 void setup()
 {
   Serial.begin(9600);
-  while (!Serial)
-  {
-    ; // wait for serial port to connect. Needed for native USB port only
-  }
+  // while (!Serial)
+  // {
+  //   ; // wait for serial port to connect. Needed for native USB port only
+  // }
   Serial.printf("\nProject version v%s, built %s\n", VERSION, BUILD_TIMESTAMP);
   Serial.println("Setup function commencing...");
-  vsAudioSetup();
+  //vsAudioSetup();
   delay(100);
   radioSetup();
 
@@ -103,25 +108,38 @@ void setup()
 
 void loop()
 {
-  // If empty request came from network, empty pig.
-  if (receiveFromCube()) {
-    empty_pig();
+  if (ball_count != last_count) {
+    Serial.println(ball_count);
+    last_count = ball_count;
   }
+  
+  // If empty request came from network, empty pig.
+  // if (receiveFromCube()) {
+  //   Serial.println("Emptying because of command from LAN.");
+  //   empty_pig();
+  // }
   
   // If pig is emptying itself due to inner flap trigger,
   // send telemetry and wait for stability.
   int val = analogRead(BALL_FULL);
   if (val < 200) {
     sendGoEvent(9);
+    Serial.println("Flap-initiated emptying detected.");
     for (int i=0; i<4; i++) {
       Watchdog.reset();
       delay(1000);
     }
+    zeroCount();
   }
   
   // If enough balls have entered from tracks, empty pig.
-  if (ball_count > BALL_MAX) {
-      empty_pig();
+  noInterrupts();
+  current_count = ball_count;
+  interrupts();
+  if (current_count > BALL_MAX) {
+    Serial.println(current_count);
+    Serial.println("Emptying because ball count exceeded threshold.");
+    empty_pig();
   }
 
   // Pet the dog.

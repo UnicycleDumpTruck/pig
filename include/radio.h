@@ -13,5 +13,6 @@
 void radioSetup();
 void sendGoEvent(uint8_t s);
 bool receiveFromCube();
+void ftoa(float f, char *str, uint8_t precision);
 
 #endif
