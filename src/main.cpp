@@ -25,10 +25,25 @@ void incrementCount() {
   interrupts();
 }
 
+void zeroCount() {
+  noInterrupts();
+  ball_count = 0;
+  interrupts();
+}
+
 void empty_pig() {
+  sendGoEvent(1); // Does not work inside VS1053 audio startPlayingFile!
+  delay(100);
+  zeroCount();
+  startAudio();
+  delay(1000);
   digitalWrite(RELAY_PIN, HIGH);
   delay(500);
   digitalWrite(RELAY_PIN, LOW);
+  for (int i=0; i<4; i++) {
+      Watchdog.reset();
+      delay(1000);
+  }
 }
 
 // ███████╗███████╗████████╗██╗   ██╗██████╗
@@ -71,8 +86,10 @@ void setup()
   digitalWrite(RELAY_PIN, LOW);
   
   // Interrupt Setup
-  attachInterrupt(0, incrementCount, RISING);
-
+  attachInterrupt(TRACK_TRUCK, incrementCount, RISING);
+  attachInterrupt(TRACK_BANK_TOP, incrementCount, RISING);
+  attachInterrupt(TRACK_ELEVATOR, incrementCount, RISING);
+  
   Watchdog.enable(4000);
   Serial.println("Setup Complete");
 }
@@ -86,7 +103,13 @@ void setup()
 
 void loop()
 {
-  receiveFromCube();
+  // If empty request came from network, empty pig.
+  if (receiveFromCube()) {
+    empty_pig();
+  }
+  
+  // If pig is emptying itself due to inner flap trigger,
+  // send telemetry and wait for stability.
   int val = analogRead(BALL_FULL);
   if (val < 200) {
     sendGoEvent(9);
@@ -94,14 +117,13 @@ void loop()
       Watchdog.reset();
       delay(1000);
     }
-    
+  }
+  
+  // If enough balls have entered from tracks, empty pig.
   if (ball_count > BALL_MAX) {
-      sendGoEvent(1); // Does not work inside VS1053 audio startPlayingFile!
-      delay(100);
-      startAudio();
       empty_pig();
-    }
   }
 
+  // Pet the dog.
   Watchdog.reset();
 }
