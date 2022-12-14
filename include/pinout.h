@@ -20,6 +20,9 @@
 #define LED_PIN 13
 #define RELAY_PIN 12
 
-#define BALL_FULL A0    // Switch inside pig body triggered by side pressure
+#define BALL_FULL A0      // Switch inside pig body triggered by side pressure
+#define TRACK_TRUCK A1    // Break-beam sensor on track from armored truck
+#define TRACK_BANK_TOP A2 // Break-beam sensor on track from top of bank
+#define TRACK_ELEVATOR A3 // Break-beam sensor on track from crank elevators
 
 #endif
