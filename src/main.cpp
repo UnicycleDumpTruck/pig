@@ -7,16 +7,7 @@
 #include <audio.h>
 #include <radio.h>
 
-// Button Header
-// Include the Bounce2 library found here :
-// https://github.com/thomasfredericks/Bounce2
-#include <Bounce2.h>
-
 #define BALL_MAX 100
-
-// INSTANTIATE A Bounce OBJECT
-Bounce bounce = Bounce();
-
 volatile uint16_t ball_count = 0;
 uint16_t last_count = 0;
 uint16_t current_count = 0;
@@ -29,12 +20,35 @@ void incrementCount() {
 
 void zeroCount() {
   noInterrupts();
+  uint16_t prev_count = ball_count;
   ball_count = 0;
   interrupts();
+  Serial.printf("Count zeroed, was at: %d", prev_count);
+}
+
+void attachBallInterrupts() {
+;
+  attachInterrupt(TRACK_TRUCK, incrementCount, RISING); // Fine
+  attachInterrupt(TRACK_BANK_TOP, incrementCount, RISING); // Trouble
+  attachInterrupt(TRACK_ELEVATOR, incrementCount, RISING);
+}
+
+void detachBallInterrupts() {
+;
+  detachInterrupt(TRACK_TRUCK);
+  detachInterrupt(TRACK_BANK_TOP);
+  detachInterrupt(TRACK_ELEVATOR);
 }
 
 void empty_pig() {
-  sendGoEvent(1); // Does not work inside VS1053 audio startPlayingFile!
+  noInterrupts();
+  uint16_t count = ball_count;
+  interrupts();
+  // Watchdog.disable();
+  detachBallInterrupts();
+  sendGoEvent(count); // Does not work inside VS1053 audio startPlayingFile!
+  attachBallInterrupts();
+  // Watchdog.enable();
   delay(100);
   //startAudio();
   delay(1000);
@@ -46,10 +60,9 @@ void empty_pig() {
       Watchdog.reset();
       delay(1000);
   }
-  Serial.print("About to zero count, currently at: ");
-  Serial.print(ball_count);
   zeroCount();
 }
+
 
 // ███████╗███████╗████████╗██╗   ██╗██████╗
 // ██╔════╝██╔════╝╚══██╔══╝██║   ██║██╔══██╗
@@ -71,17 +84,6 @@ void setup()
   delay(100);
   radioSetup();
 
-  // BOUNCE SETUP
-
-  // SELECT ONE OF THE FOLLOWING :
-  // 1) IF YOUR INPUT HAS AN INTERNAL PULL-UP
-  bounce.attach(BOUNCE_PIN, INPUT_PULLUP); // USE INTERNAL PULL-UP
-  // 2) IF YOUR INPUT USES AN EXTERNAL PULL-UP
-  //bounce.attach( BOUNCE_PIN, INPUT ); // USE EXTERNAL PULL-UP
-
-  // DEBOUNCE INTERVAL IN MILLISECONDS
-  bounce.interval(5); // interval in ms
-
   // LED SETUP
   pinMode(LED_PIN, OUTPUT);
   digitalWrite(LED_PIN, LOW);
@@ -91,10 +93,8 @@ void setup()
   digitalWrite(RELAY_PIN, LOW);
   
   // Interrupt Setup
-  attachInterrupt(TRACK_TRUCK, incrementCount, RISING);
-  attachInterrupt(TRACK_BANK_TOP, incrementCount, RISING);
-  attachInterrupt(TRACK_ELEVATOR, incrementCount, RISING);
-  
+  attachBallInterrupts();
+
   Watchdog.enable(4000);
   Serial.println("Setup Complete");
 }
@@ -123,12 +123,15 @@ void loop()
   // send telemetry and wait for stability.
   int val = analogRead(BALL_FULL);
   if (val < 200) {
-    sendGoEvent(9);
     Serial.println("Flap-initiated emptying detected.");
-    for (int i=0; i<4; i++) {
+
+    for (int i=0; i<6; i++) {
       Watchdog.reset();
       delay(1000);
     }
+    detachBallInterrupts();
+    sendGoEvent(9); //last_count);
+    attachBallInterrupts();
     zeroCount();
   }
   

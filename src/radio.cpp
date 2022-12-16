@@ -30,7 +30,7 @@ void sendGoEvent(uint8_t s)
     Serial.print("About to send transmission number: ");
     Serial.println(eventData.counter);
     digitalWrite(RFM69_CS, LOW);
-    delay(10);
+    delay(100);
     bool t_result = rf69.send((uint8_t *)&eventData, sizeof(eventData));
     delay(100);
     //rf69.waitPacketSent();
@@ -87,7 +87,7 @@ void radioSetup()
 
     eventData.counter = 0;
 
-    sendGoEvent(0);
+    sendGoEvent(0); // Send boot message
     digitalWrite(RFM69_CS, HIGH);
     Serial.println("Radio Setup Complete");
 }
@@ -115,9 +115,6 @@ bool receiveFromCube()
 		if (eventData.cubeID == 0) // if message was from gateway
 		{
 			if (eventData.side == 61) { // if message is to drop the pig
-				digitalWrite(RELAY_PIN, HIGH); // drop the pig
-				delay(500);
-				digitalWrite(RELAY_PIN,LOW);
         digitalWrite(RFM69_CS, HIGH);
         return true;
 			}
@@ -126,7 +123,10 @@ bool receiveFromCube()
     digitalWrite(RFM69_CS, HIGH);
     return false;
 	}
+  digitalWrite(RFM69_CS, HIGH);
+  return false;
 }
+
 
 // ftoa from http://www.ars-informatica.ca/eclectic/ftoa-convert-a-floating-point-number-to-a-character-array-on-the-arduino/
 void ftoa(float f, char *str, uint8_t precision) {

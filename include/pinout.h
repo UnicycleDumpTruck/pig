@@ -4,6 +4,7 @@
 #include <Arduino.h>
 
 // Radio Pins
+// PIN A2 as interrupt interferes with RFM69!!!
 #define RFM69_CS 8
 #define RFM69_INT 3
 #define RFM69_RST 4
@@ -20,9 +21,10 @@
 #define LED_PIN 13
 #define RELAY_PIN 12
 
+// PIN A2 as interrupt interferes with RFM69!!!
 #define BALL_FULL A0      // Switch inside pig body triggered by side pressure
 #define TRACK_TRUCK A1    // Break-beam sensor on track from armored truck
-#define TRACK_BANK_TOP A2 // Break-beam sensor on track from top of bank
+#define TRACK_BANK_TOP A5 // Break-beam sensor on track from top of bank
 #define TRACK_ELEVATOR A3 // Break-beam sensor on track from crank elevators
 
 #endif
