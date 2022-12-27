@@ -7,7 +7,7 @@
 #include <audio.h>
 #include <radio.h>
 
-#define BALL_MAX 100
+#define BALL_MAX 200
 volatile uint16_t ball_count = 0;
 uint16_t last_count = 0;
 uint16_t current_count = 0;
@@ -28,8 +28,8 @@ void zeroCount() {
 
 void attachBallInterrupts() {
 ;
-  attachInterrupt(TRACK_TRUCK, incrementCount, RISING); // Fine
-  attachInterrupt(TRACK_BANK_TOP, incrementCount, RISING); // Trouble
+  attachInterrupt(TRACK_TRUCK, incrementCount, RISING);
+  attachInterrupt(TRACK_BANK_TOP, incrementCount, RISING);
   attachInterrupt(TRACK_ELEVATOR, incrementCount, RISING);
 }
 
@@ -51,7 +51,7 @@ void empty_pig() {
   // Watchdog.enable();
   delay(100);
   //startAudio();
-  delay(1000);
+  //delay(1000);
   digitalWrite(RELAY_PIN, HIGH);
   delay(500);
   Watchdog.reset();
@@ -130,7 +130,7 @@ void loop()
       delay(1000);
     }
     detachBallInterrupts();
-    sendGoEvent(9); //last_count);
+    sendGoEvent(last_count);
     attachBallInterrupts();
     zeroCount();
   }
