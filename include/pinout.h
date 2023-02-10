@@ -3,6 +3,10 @@
 
 #include <Arduino.h>
 
+// Serial Pins
+#define RS485_RX 0 //11
+#define RS485_TX 1 //A2
+
 // Radio Pins
 // PIN A2 as interrupt interferes with RFM69!!!
 #define RFM69_CS 8
@@ -17,8 +21,7 @@
 #define DREQ 9          // VS1053 Data request, ideally an Interrupt pin
 
 // Button Pins
-#define BOUNCE_PIN A0
-#define LED_PIN 13
+// #define LED_PIN 13
 #define RELAY_PIN 12
 
 // PIN A2 as interrupt interferes with RFM69!!!

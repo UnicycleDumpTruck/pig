@@ -7,6 +7,14 @@
 #include <audio.h>
 #include <radio.h>
 
+// Create second Serial device on M0 sercom
+// Uart Serial2 (&sercom1, RS485_RX, RS485_TX, SERCOM_RX_PAD_0, UART_TX_PAD_2);
+
+// void SERCOM1_Handler()
+// {
+//   Serial2.IrqHandler();
+// }
+
 #define BALL_MAX 200
 volatile uint16_t ball_count = 0;
 uint16_t last_count = 0;
@@ -84,9 +92,9 @@ void setup()
   delay(100);
   radioSetup();
 
-  // LED SETUP
-  pinMode(LED_PIN, OUTPUT);
-  digitalWrite(LED_PIN, LOW);
+  // // LED SETUP
+  // pinMode(LED_PIN, OUTPUT);
+  // digitalWrite(LED_PIN, LOW);
   
   // RELAY SETUP
   pinMode(RELAY_PIN, OUTPUT);
@@ -96,6 +104,22 @@ void setup()
   attachBallInterrupts();
 
   Watchdog.enable(4000);
+
+  Serial.println("Starting Serial1");
+  Serial1.begin(300);
+  // pinPeripheral(RS485_RX, PIO_SERCOM);
+  // pinPeripheral(RS485_TX, PIO_SERCOM);
+  delay(20);
+  int serial_count = 0;
+  Serial1.println("test");
+  // Serial1.write("\n");
+  // serial_count++;
+  // Serial1.write(serial_count);
+  // serial_count++;
+  // Serial1.write(serial_count);
+  // serial_count++;
+  // Serial1.write(serial_count);
+
   Serial.println("Setup Complete");
 }
 
@@ -108,6 +132,7 @@ void setup()
 
 void loop()
 {
+  // Serial1.println("t");
   if (ball_count != last_count) {
     Serial.println(ball_count);
     last_count = ball_count;
