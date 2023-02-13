@@ -133,12 +133,13 @@ void loop()
 {
   
   Serial.println ("Starting numbers send on Serial1...");
-  for (int i = 0; i < 10; i++)
+  for (int i = 0; i < 19; i++)
     {
     Serial1.print (startOfNumberDelimiter);    
-    Serial1.print (rand ());    // send the number
+    Serial1.print (i);    // send the number
     Serial1.print (endOfNumberDelimiter);  
     Serial1.println ();
+    delay(100);
     }  // end of for
 
   delay (3000);
