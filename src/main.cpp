@@ -20,6 +20,9 @@ volatile uint16_t ball_count = 0;
 uint16_t last_count = 0;
 uint16_t current_count = 0;
 
+const char startOfNumberDelimiter = '<';
+const char endOfNumberDelimiter   = '>';
+
 void incrementCount() {
   noInterrupts();
   ball_count++;
@@ -105,20 +108,16 @@ void setup()
 
   Watchdog.enable(4000);
 
+
+  srand (42);
+
+
   Serial.println("Starting Serial1");
-  Serial1.begin(300);
+  Serial1.begin(9600);
   // pinPeripheral(RS485_RX, PIO_SERCOM);
   // pinPeripheral(RS485_TX, PIO_SERCOM);
   delay(20);
-  int serial_count = 0;
   Serial1.println("test");
-  // Serial1.write("\n");
-  // serial_count++;
-  // Serial1.write(serial_count);
-  // serial_count++;
-  // Serial1.write(serial_count);
-  // serial_count++;
-  // Serial1.write(serial_count);
 
   Serial.println("Setup Complete");
 }
@@ -132,6 +131,21 @@ void setup()
 
 void loop()
 {
+  
+  Serial.println ("Starting numbers send on Serial1...");
+  for (int i = 0; i < 10; i++)
+    {
+    Serial1.print (startOfNumberDelimiter);    
+    Serial1.print (rand ());    // send the number
+    Serial1.print (endOfNumberDelimiter);  
+    Serial1.println ();
+    }  // end of for
+
+  delay (3000);
+
+  
+  
+  
   // Serial1.println("t");
   if (ball_count != last_count) {
     Serial.println(ball_count);
