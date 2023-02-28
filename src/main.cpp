@@ -114,10 +114,22 @@ void setup()
 
   Serial.println("Starting Serial1");
   Serial1.begin(9600);
-  // pinPeripheral(RS485_RX, PIO_SERCOM);
-  // pinPeripheral(RS485_TX, PIO_SERCOM);
   delay(20);
-  Serial1.println("test");
+  Serial.println ("Starting numbers send on Serial1...");
+  for (int i = 0; i < 19; i++)
+    {
+    Serial1.print (startOfNumberDelimiter);    
+    Serial1.print (i);    // send the number
+    Serial1.print (endOfNumberDelimiter);  
+    Serial1.println ();
+    delay(100);
+    }  // end of for
+    delay(1000);
+    Serial1.print (startOfNumberDelimiter);    
+    Serial1.print (0);    // send the number
+    Serial1.print (endOfNumberDelimiter);  
+    Serial1.println ();
+
 
   Serial.println("Setup Complete");
 }
@@ -132,25 +144,25 @@ void setup()
 void loop()
 {
   
-  Serial.println ("Starting numbers send on Serial1...");
-  for (int i = 0; i < 19; i++)
-    {
-    Serial1.print (startOfNumberDelimiter);    
-    Serial1.print (i);    // send the number
-    Serial1.print (endOfNumberDelimiter);  
-    Serial1.println ();
-    delay(100);
-    }  // end of for
-
-  delay (3000);
-
+  // Serial.println ("Starting numbers send on Serial1...");
+  // for (int i = 0; i < 19; i++)
+  //   {
+  //   Serial1.print (startOfNumberDelimiter);    
+  //   Serial1.print (i);    // send the number
+  //   Serial1.print (endOfNumberDelimiter);  
+  //   Serial1.println ();
+  //   delay(100);
+  //   }  // end of for
+  // delay (3000);
   
-  
-  
-  // Serial1.println("t");
   if (ball_count != last_count) {
     Serial.println(ball_count);
     last_count = ball_count;
+    int led_count = map(last_count, 0, 200, 0, 18);
+    Serial1.print (startOfNumberDelimiter);    
+    Serial1.print (led_count);    // send the number
+    Serial1.print (endOfNumberDelimiter);  
+    Serial1.println ();
   }
   
   // If empty request came from network, empty pig.
