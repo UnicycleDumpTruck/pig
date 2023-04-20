@@ -4,13 +4,40 @@
 Adafruit_VS1053_FilePlayer musicPlayer =
     Adafruit_VS1053_FilePlayer(SHIELD_RESET, SHIELD_CS, SHIELD_DCS, DREQ, CARDCS);
 
+/// File listing helper
+void printDirectory(File dir, int numTabs) {
+   while(true) {
+     
+     File entry =  dir.openNextFile();
+     if (! entry) {
+       // no more files
+       //Serial.println("**nomorefiles**");
+       break;
+     }
+     for (uint8_t i=0; i<numTabs; i++) {
+       Serial.print('\t');
+     }
+     Serial.print(entry.name());
+     if (entry.isDirectory()) {
+       Serial.println("/");
+       printDirectory(entry, numTabs+1);
+     } else {
+       // files have sizes, directories do not
+       Serial.print("\t\t");
+       Serial.println(entry.size(), DEC);
+     }
+     entry.close();
+   }
+}
+
+
 void vsAudioSetup()
 {
     pinMode(CARDCS, OUTPUT);
     pinMode(SHIELD_CS, OUTPUT);
 
     digitalWrite(SHIELD_CS, LOW);
-    delay(50);
+    delay(1000);
 
     if (!musicPlayer.begin())
     { // initialise the music player
@@ -28,6 +55,8 @@ void vsAudioSetup()
         while (1)
             ; // don't do anything more
     }
+    // list files
+    printDirectory(SD.open("/"), 0);
     digitalWrite(CARDCS, HIGH);
 
     // Set volume for left, right channels. lower numbers == louder volume!
@@ -35,13 +64,18 @@ void vsAudioSetup()
     musicPlayer.setVolume(0, 0);
     musicPlayer.useInterrupt(VS1053_FILEPLAYER_PIN_INT); // DREQ int
     digitalWrite(SHIELD_CS, HIGH);
+
+    startAudio();
+    delay(2000);
+    stopAudio();
+    Serial.println(F("Audio Setup Complete."));
 }
 
 void startAudio()
 {
     Serial.println(F("Playing Sound"));
     digitalWrite(SHIELD_CS, LOW);
-    musicPlayer.startPlayingFile("/track002.mp3");
+    musicPlayer.startPlayingFile("/oink.mp3");
     digitalWrite(SHIELD_CS, HIGH);
 }
 

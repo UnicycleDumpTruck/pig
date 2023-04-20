@@ -9,9 +9,9 @@
 
 // Radio Pins
 // PIN A2 as interrupt interferes with RFM69!!!
-#define RFM69_CS 8
-#define RFM69_INT 3
-#define RFM69_RST 4
+#define RFM69_CS A2 // 8
+#define RFM69_INT 11 // 3
+#define RFM69_RST A4 // 4
 
 // Audio Featherwing Pins
 #define SHIELD_RESET -1 // VS1053 reset pin (unused!)

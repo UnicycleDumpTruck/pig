@@ -34,6 +34,20 @@ void zeroCount() {
   uint16_t prev_count = ball_count;
   ball_count = 0;
   interrupts();
+
+  // Zero the pig dot LED display:
+  Serial1.print (startOfNumberDelimiter);    
+  Serial1.print (0);    // send the number
+  Serial1.print (endOfNumberDelimiter);  
+  Serial1.println ();
+  delay(10);
+  // Zero the pig dot LED display:
+  Serial1.print (startOfNumberDelimiter);    
+  Serial1.print (0);    // send the number
+  Serial1.print (endOfNumberDelimiter);  
+  Serial1.println ();
+
+
   Serial.printf("Count zeroed, was at: %d", prev_count);
 }
 
@@ -61,8 +75,8 @@ void empty_pig() {
   attachBallInterrupts();
   // Watchdog.enable();
   delay(100);
-  //startAudio();
-  //delay(1000);
+  startAudio();
+  delay(2000);
   digitalWrite(RELAY_PIN, HIGH);
   delay(500);
   Watchdog.reset();
@@ -85,13 +99,13 @@ void empty_pig() {
 void setup()
 {
   Serial.begin(9600);
-  // while (!Serial)
-  // {
-  //   ; // wait for serial port to connect. Needed for native USB port only
-  // }
+  while (!Serial)
+  {
+    ; // wait for serial port to connect. Needed for native USB port only
+  }
   Serial.printf("\nProject version v%s, built %s\n", VERSION, BUILD_TIMESTAMP);
   Serial.println("Setup function commencing...");
-  //vsAudioSetup();
+  vsAudioSetup();
   delay(100);
   radioSetup();
 
@@ -159,6 +173,8 @@ void loop()
     Serial.println(ball_count);
     last_count = ball_count;
     int led_count = map(last_count, 0, 200, 0, 18);
+    Serial.print("led_count: ");
+    Serial.println(led_count);
     Serial1.print (startOfNumberDelimiter);    
     Serial1.print (led_count);    // send the number
     Serial1.print (endOfNumberDelimiter);  
