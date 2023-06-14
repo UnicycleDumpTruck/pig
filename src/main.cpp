@@ -7,14 +7,6 @@
 #include <audio.h>
 #include <radio.h>
 
-// Create second Serial device on M0 sercom
-// Uart Serial2 (&sercom1, RS485_RX, RS485_TX, SERCOM_RX_PAD_0, UART_TX_PAD_2);
-
-// void SERCOM1_Handler()
-// {
-//   Serial2.IrqHandler();
-// }
-
 #define BALL_MAX 200
 volatile uint16_t ball_count = 0;
 uint16_t last_count = 0;
@@ -65,26 +57,44 @@ void detachBallInterrupts() {
   detachInterrupt(TRACK_ELEVATOR);
 }
 
+void displayDots(int num) {
+    Serial1.print (startOfNumberDelimiter);    
+    Serial1.print (num);    // send the number
+    Serial1.print (endOfNumberDelimiter);  
+    Serial1.println ();
+}
+
 void empty_pig() {
   noInterrupts();
   uint16_t count = ball_count;
   interrupts();
-  // Watchdog.disable();
-  detachBallInterrupts();
-  sendGoEvent(count); // Does not work inside VS1053 audio startPlayingFile!
-  attachBallInterrupts();
-  // Watchdog.enable();
   delay(100);
+  detachBallInterrupts();
   startAudio();
-  delay(2000);
+  for (int i=0; i<10; i++) {
+    displayDots(0);
+    delay(300);
+    displayDots(18);
+    delay(300);
+    Watchdog.reset();
+  }
   digitalWrite(RELAY_PIN, HIGH);
-  delay(500);
+  stopAudio();
+  delay(2100);
   Watchdog.reset();
   digitalWrite(RELAY_PIN, LOW);
   for (int i=0; i<4; i++) {
       Watchdog.reset();
       delay(1000);
   }
+  //attachBallInterrupts();
+  //detachBallInterrupts();
+  Watchdog.reset();
+  // Watchdog.disable();
+  zeroCount();
+  sendGoEvent(count); // Does not work inside VS1053 audio startPlayingFile!
+  attachBallInterrupts();
+  // Watchdog.enable();
   zeroCount();
 }
 
@@ -108,10 +118,6 @@ void setup()
   vsAudioSetup();
   delay(100);
   radioSetup();
-
-  // // LED SETUP
-  // pinMode(LED_PIN, OUTPUT);
-  // digitalWrite(LED_PIN, LOW);
   
   // RELAY SETUP
   pinMode(RELAY_PIN, OUTPUT);
@@ -121,7 +127,6 @@ void setup()
   attachBallInterrupts();
 
   Watchdog.enable(4000);
-
 
   srand (42);
 
@@ -156,19 +161,7 @@ void setup()
 // ╚══════╝ ╚═════╝  ╚═════╝ ╚═╝
 
 void loop()
-{
-  
-  // Serial.println ("Starting numbers send on Serial1...");
-  // for (int i = 0; i < 19; i++)
-  //   {
-  //   Serial1.print (startOfNumberDelimiter);    
-  //   Serial1.print (i);    // send the number
-  //   Serial1.print (endOfNumberDelimiter);  
-  //   Serial1.println ();
-  //   delay(100);
-  //   }  // end of for
-  // delay (3000);
-  
+{  
   if (ball_count != last_count) {
     Serial.println(ball_count);
     last_count = ball_count;
