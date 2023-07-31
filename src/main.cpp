@@ -71,15 +71,15 @@ void empty_pig() {
   delay(100);
   detachBallInterrupts();
   startAudio();
-  for (int i=0; i<10; i++) {
+  for (int i=0; i<6; i++) {
     displayDots(0);
-    delay(300);
+    delay(230);
     displayDots(18);
-    delay(300);
+    delay(230);
     Watchdog.reset();
   }
   digitalWrite(RELAY_PIN, HIGH);
-  stopAudio();
+  //stopAudio();
   delay(2100);
   Watchdog.reset();
   digitalWrite(RELAY_PIN, LOW);
@@ -109,15 +109,20 @@ void empty_pig() {
 void setup()
 {
   Serial.begin(9600);
-  while (!Serial)
-  {
-    ; // wait for serial port to connect. Needed for native USB port only
-  }
+  // while (!Serial)
+  // {
+  //   ; // wait for serial port to connect. Needed for native USB port only
+  // }
   Serial.printf("\nProject version v%s, built %s\n", VERSION, BUILD_TIMESTAMP);
   Serial.println("Setup function commencing...");
+
+  Watchdog.enable(8000);
+
   vsAudioSetup();
+  Watchdog.reset();
   delay(100);
   radioSetup();
+  Watchdog.reset();
   
   // RELAY SETUP
   pinMode(RELAY_PIN, OUTPUT);
@@ -126,26 +131,25 @@ void setup()
   // Interrupt Setup
   attachBallInterrupts();
 
-  Watchdog.enable(4000);
 
   srand (42);
-
 
   Serial.println("Starting Serial1");
   Serial1.begin(9600);
   delay(20);
-  Serial.println ("Starting numbers send on Serial1...");
-  for (int i = 0; i < 19; i++)
-    {
+  Serial.println ("Starting send on Serial1...");
+  // for (int i = 0; i < 19; i++)
+  //   {
+  //     Watchdog.reset();
+  //     Serial1.print (startOfNumberDelimiter);    
+  //     Serial1.print (i);    // send the number
+  //     Serial1.print (endOfNumberDelimiter);  
+  //     Serial1.println ();
+  //     delay(100);
+  //   }  // end of for
+  //   delay(1000);
     Serial1.print (startOfNumberDelimiter);    
-    Serial1.print (i);    // send the number
-    Serial1.print (endOfNumberDelimiter);  
-    Serial1.println ();
-    delay(100);
-    }  // end of for
-    delay(1000);
-    Serial1.print (startOfNumberDelimiter);    
-    Serial1.print (0);    // send the number
+    Serial1.print (0);    // send the number zero to clear the LED display
     Serial1.print (endOfNumberDelimiter);  
     Serial1.println ();
 
