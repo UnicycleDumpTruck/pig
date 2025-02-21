@@ -21,7 +21,7 @@
 #define DREQ 9          // VS1053 Data request, ideally an Interrupt pin
 
 // Button Pins
-// #define LED_PIN 13
+#define REMOTE_INPUT_PIN 13
 #define RELAY_PIN 12
 
 // PIN A2 as interrupt interferes with RFM69!!!

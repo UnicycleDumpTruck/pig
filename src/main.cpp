@@ -127,6 +127,9 @@ void setup()
   // RELAY SETUP
   pinMode(RELAY_PIN, OUTPUT);
   digitalWrite(RELAY_PIN, LOW);
+
+  // Remote Control Input Setup
+  pinMode(REMOTE_INPUT_PIN, INPUT_PULLUP);
   
   // Interrupt Setup
   attachBallInterrupts();
@@ -198,6 +201,13 @@ void loop()
     sendGoEvent(last_count);
     attachBallInterrupts();
     zeroCount();
+  }
+
+  bool status = digitalRead(REMOTE_INPUT_PIN);
+  if (status == LOW) {
+    Serial.println(current_count);
+    Serial.println("Emptying because remote control button pushed.");
+    empty_pig();
   }
   
   // If enough balls have entered from tracks, empty pig.
